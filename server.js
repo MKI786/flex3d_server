@@ -19,6 +19,7 @@ server.use('/client', require('./Routes/ClientRoutes.js'));
 server.use(async(req, res)=>{
     res.send("server is running on port 3000");
 })
-server.listen(3000, () => {
-    console.log("server is start listening ")
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log("server is Listening on Port: ", PORT)
 })
