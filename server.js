@@ -17,7 +17,7 @@ server.use('/client', require('./Routes/ClientRoutes.js'));
 const PORT = process.env.PORT || 8080;
 
 server.use(async(req, res)=>{
-    res.send("server is running on port ${PORT} );
+    res.send(`server is running on port ${PORT}`);
 })
 
 server.listen(PORT, () => {
