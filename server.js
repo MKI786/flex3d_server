@@ -14,12 +14,12 @@ connectdb();
 server.use('/client', require('./Routes/ClientRoutes.js'));
 
 
-
+const PORT = process.env.PORT || 8080;
 
 server.use(async(req, res)=>{
-    res.send("server is running on port 3000");
+    res.send("server is running on port", PORT);
 })
-const PORT = process.env.PORT || 3000;
+
 server.listen(PORT, () => {
     console.log("server is Listening on Port: ", PORT)
 })
