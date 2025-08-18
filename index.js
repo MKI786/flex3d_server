@@ -24,69 +24,66 @@ app.use(cors());
 connectdb();
 
 
-const upload = multer({ dest: "uploads/" });
+// const upload = multer({ dest: "uploads/" });
 
 
-// Folder ID jahan files upload hongi
-const FOLDER_ID = "1iXBLU3gwi-8hpQ0JapTHyk4frn7j0UJ6";
+// // Folder ID jahan files upload hongi
+// const FOLDER_ID = "1iXBLU3gwi-8hpQ0JapTHyk4frn7j0UJ6";
 
 
 
 
 
-const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+// const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
 
-const auth = new google.auth.GoogleAuth({
-  credentials: serviceAccount,
-  scopes: ["https://www.googleapis.com/auth/drive.file"],
-});
+// const auth = new google.auth.GoogleAuth({
+//   credentials: serviceAccount,
+//   scopes: ["https://www.googleapis.com/auth/drive.file"],
+// });
 
+// const drive = google.drive({ version: "v3", auth });
 
-// Google Drive client
-const drive = google.drive({ version: "v3", auth });
-
-// File upload function
-async function uploadToDrive(fileName, filePath) {
-  const fileMetadata = {
-    name: fileName,
-    parents: [FOLDER_ID],
-  };
-  const media = {
-    mimeType: "model/gltf-binary",
-    body: fs.createReadStream(filePath),
-  };
-  const file = await drive.files.create({
-    resource: fileMetadata,
-    media: media,
-    fields: "id, webViewLink, webContentLink",
-  });
-  return file.data; // yahan se link mil jayega
-}
+// async function uploadToDrive(fileName, filePath) {
+//   const fileMetadata = {
+//     name: fileName,
+//     parents: [FOLDER_ID],
+//   };
+//   const media = {
+//     mimeType: "model/gltf-binary",
+//     body: fs.createReadStream(filePath),
+//   };
+//   const file = await drive.files.create({
+//     resource: fileMetadata,
+//     media: media,
+//     fields: "id, webViewLink, webContentLink",
+//   });
+//   return file.data; // yahan se link mil jayega
+// }
 
 
-app.post("/uploadmega", upload.single("file"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file received (field name must be 'file')." });
-    }
+// app.post("/uploadmega", upload.single("file"), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ error: "No file received (field name must be 'file')." });
+//     }
 
-    const { originalname, path: tempPath } = req.file;
-    console.log("📥 Received:", originalname, tempPath);
+//     const { originalname, path: tempPath } = req.file;
+//     console.log("📥 Received:", originalname, tempPath);
 
-    // Upload to Google Drive
-    const publicLink = await uploadToDrive(originalname, tempPath);
+//     // Upload to Google Drive
+//     const publicLink = await uploadToDrive(originalname, tempPath);
 
-    // Delete temp file
-    fs.unlinkSync(tempPath);
+//     // Delete temp file
+//     fs.unlinkSync(tempPath);
 
-    // Return ONLY the link
-    res.json({ link: publicLink.webViewLink });
-    // or: res.json({ link: publicLink.webContentLink });
-  } catch (err) {
-    console.error("❌ UploadGoogleDrive Error:", err);
-    res.status(500).json({ error: err.message || "Upload failed" });
-  }
-});
+//     // Return ONLY the link
+//     res.json({ link: publicLink.webViewLink });
+//     // or: res.json({ link: publicLink.webContentLink });
+//   } catch (err) {
+//     console.error("❌ UploadGoogleDrive Error:", err);
+//     res.status(500).json({ error: err.message || "Upload failed" });
+//   }
+// });
 
 
 
