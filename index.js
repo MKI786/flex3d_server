@@ -36,9 +36,6 @@ const FOLDER_ID = "1iXBLU3gwi-8hpQ0JapTHyk4frn7j0UJ6";
 
 const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
 
-// 2️⃣ Fix the line breaks in private_key
-serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-
 const auth = new google.auth.GoogleAuth({
   credentials: serviceAccount,
   scopes: ["https://www.googleapis.com/auth/drive.file"],
