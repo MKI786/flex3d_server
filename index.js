@@ -87,10 +87,6 @@ connectdb();
 
 
 
-
-
-
-// Routes
 app.use('/client', require('./Routes/ClientRoutes.js'));
 
 app.get('/', (req, res) => {
