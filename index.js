@@ -60,18 +60,25 @@ app.post("/uploadglbfile", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
+    console.log("📂 File received:", {
+      name: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+    });
+
     const fileBuffer = req.file.buffer;
-    const fileName = Date.now() + "-" + req.file.originalname; // unique filename
-    const mimeType = req.file.mimetype;
+    const fileName = Date.now() + "-" + req.file.originalname;
+    const mimeType = req.file.mimetype || "application/octet-stream";
 
     const link = await uploadFile(fileBuffer, fileName, mimeType);
 
     res.json({ link });
   } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ error: "File upload failed" });
+    console.error("❌ Upload error:", error); // full error print karna
+    res.status(500).json({ error: "File upload failed", details: error.message });
   }
 });
+
 
 
 
