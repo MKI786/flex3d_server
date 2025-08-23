@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const multer = require('multer');
 const { google } = require("googleapis");
-const { S3Client, PutObjectCommand } =  requir('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand } =  require('@aws-sdk/client-s3');
 
 dotenv.config();
 
