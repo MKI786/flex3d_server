@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const multer = require('multer');
 const { google } = require("googleapis");
+const { S3Client, PutObjectCommand } =  requir('@aws-sdk/client-s3');
 
 dotenv.config();
 
@@ -24,66 +25,55 @@ app.use(cors());
 connectdb();
 
 
-// const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/" });
 
 
-// // Folder ID jahan files upload hongi
-// const FOLDER_ID = "1iXBLU3gwi-8hpQ0JapTHyk4frn7j0UJ6";
+// Cloudflare R2 client setup
+const s3 = new S3Client({
+  region: "auto",
+  endpoint: "https://081611aef2796aa74fbcdbdeb3099f32.r2.cloudflarestorage.com", // apna R2 endpoint yahan dalna
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  },
+});
+
+// File upload helper function
+async function uploadFile(fileBuffer, fileName, mimeType) {
+  const command = new PutObjectCommand({
+    Bucket: "flex3dmodels", 
+    Key: fileName,
+    Body: fileBuffer,
+    ContentType: mimeType,
+  });
+
+  await s3.send(command);
+
+  // return public URL
+  return `https://cdn.flex3d.shop/${fileName}`;
+}
 
 
+app.post("/uploadglbfile", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const fileBuffer = req.file.buffer;
+    const fileName = Date.now() + "-" + req.file.originalname; // unique filename
+    const mimeType = req.file.mimetype;
+
+    const link = await uploadFile(fileBuffer, fileName, mimeType);
+
+    res.json({ link });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "File upload failed" });
+  }
+});
 
 
-
-// const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
-
-// const auth = new google.auth.GoogleAuth({
-//   credentials: serviceAccount,
-//   scopes: ["https://www.googleapis.com/auth/drive.file"],
-// });
-
-// const drive = google.drive({ version: "v3", auth });
-
-// async function uploadToDrive(fileName, filePath) {
-//   const fileMetadata = {
-//     name: fileName,
-//     parents: [FOLDER_ID],
-//   };
-//   const media = {
-//     mimeType: "model/gltf-binary",
-//     body: fs.createReadStream(filePath),
-//   };
-//   const file = await drive.files.create({
-//     resource: fileMetadata,
-//     media: media,
-//     fields: "id, webViewLink, webContentLink",
-//   });
-//   return file.data; // yahan se link mil jayega
-// }
-
-
-// app.post("/uploadmega", upload.single("file"), async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ error: "No file received (field name must be 'file')." });
-//     }
-
-//     const { originalname, path: tempPath } = req.file;
-//     console.log("📥 Received:", originalname, tempPath);
-
-//     // Upload to Google Drive
-//     const publicLink = await uploadToDrive(originalname, tempPath);
-
-//     // Delete temp file
-//     fs.unlinkSync(tempPath);
-
-//     // Return ONLY the link
-//     res.json({ link: publicLink.webViewLink });
-//     // or: res.json({ link: publicLink.webContentLink });
-//   } catch (err) {
-//     console.error("❌ UploadGoogleDrive Error:", err);
-//     res.status(500).json({ error: err.message || "Upload failed" });
-//   }
-// });
 
 
 
