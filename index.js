@@ -25,7 +25,7 @@ app.use(cors());
 connectdb();
 
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
 
 // Cloudflare R2 client setup
