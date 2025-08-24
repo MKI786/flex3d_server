@@ -47,11 +47,9 @@ async function uploadFile(fileBuffer, fileName, mimeType) {
     ContentType: mimeType,
   });
 
-  await s3.send(command);
-
-  // return public URL
- return `https://081611aef2796aa74fbcdbdeb3099f32.r2.cloudflarestorage.com/flex3dmodels/${fileName}`;
-
+ await s3.send(command);
+ 
+ return `https://cdn.flex3d.shop/${fileName}`;
 }
 
 
