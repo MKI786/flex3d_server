@@ -19,19 +19,16 @@ const allowedOrigins = [
 ];
 
 
-app.use(cors(), (req, res, next) => {
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   }
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-
-});
+}));
 
 
 connectdb();
@@ -102,7 +99,7 @@ app.get('/', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT ;
 
 app.listen(PORT, () => {
   console.log(`Server is Listening on Port: ${PORT}`);
